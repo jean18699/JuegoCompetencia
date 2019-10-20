@@ -7,6 +7,7 @@ public class Movimiento : MonoBehaviour
 
     public float Velocidad = 0;
     public Animator animator;
+    public SpriteRenderer sprite;
     private float movHorizontal = 0f; //parametro para hacer transicion entre la animacion iddle y caminar
     private float movVertical = 0f;
     private float runSpeed = 2f;
@@ -16,7 +17,7 @@ public class Movimiento : MonoBehaviour
     {
         
         animator = transform.GetComponent<Animator>();
-        
+        sprite = transform.GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -24,52 +25,45 @@ public class Movimiento : MonoBehaviour
     {
         //CONTROLANDO LAS ANIMACIONES
         movHorizontal = Input.GetAxisRaw("Horizontal") * runSpeed ;
-        animator.SetFloat("speedX",Mathf.Abs(movHorizontal));
-
-        movVertical = Input.GetAxisRaw("Vertical") * runSpeed;
-        animator.SetFloat("speedY",Mathf.Abs(movVertical));
+        animator.SetFloat("speed",Mathf.Abs(movHorizontal));
 
         if(Input.GetKey(KeyCode.A)){
-            animator.SetBool("teclaIzquierda",true);
-            animator.SetBool("teclaDerecha",false);
-            animator.SetBool("teclaArriba",false);
-            animator.SetBool("teclaAbajo",false);
-            
-        }
-        if(Input.GetKey(KeyCode.D)){
-            animator.SetBool("teclaIzquierda",false);
-            animator.SetBool("teclaDerecha",true);
-            animator.SetBool("teclaArriba",false);
-            animator.SetBool("teclaAbajo",false);
-           // animator.SetFloat("speed",0);
-        }
-        if(Input.GetKey(KeyCode.W)){
-            animator.SetBool("teclaIzquierda",false);
-            animator.SetBool("teclaDerecha",false);
-            animator.SetBool("teclaArriba",true);
-            animator.SetBool("teclaAbajo",false);
-            
-        }
-        if(Input.GetKey(KeyCode.S)){
-            animator.SetBool("teclaIzquierda",false);
-            animator.SetBool("teclaDerecha",false);
-            animator.SetBool("teclaArriba",false);
-            animator.SetBool("teclaAbajo",true);
+            animator.SetBool("mover",true);
+            sprite.flipX = true;
         }
 
-        moverse();
+        if(Input.GetKey(KeyCode.D)){
+            animator.SetBool("mover", true);
+            sprite.flipX = false;
+           // animator.SetFloat("speed",0);
+        }
+
        
-      
+        
+        moverse();
+    
+    }
+
+    private void FixedUpdate()
+    {
+        //Default
+        animator.SetBool("mover", false);
     }
 
     void moverse(){
-      this.transform.Translate(new Vector3(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical")) * Velocidad);
+      this.transform.Translate(new Vector3(Input.GetAxis("Horizontal"),0) * Velocidad);
        
        //Sprintear
        if(Input.GetKey(KeyCode.LeftShift)){
            Velocidad = 0.1f; //velocidad de corrida
-       }else{
+            animator.SetFloat("sprint", 1.2f); //acelerando animacion
+
+        }
+        else
+        {
            Velocidad = 0.04f; //velocidad normal caminando
-       }
+           animator.SetFloat("sprint", 1); //devolviendo animacion a su velocidad normal
+
+        }
     }
 }
